@@ -14,7 +14,14 @@ const rowVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-const items = [
+type WorkItem = {
+  number: string;
+  headline: string;
+  description: string;
+  link?: { label: string; href: string };
+};
+
+const items: WorkItem[] = [
   {
     number: "01",
     headline: "Process-oriented, flexibly creative",
@@ -38,6 +45,7 @@ const items = [
     headline: "AI as a thinking partner",
     description:
       "I use AI for discovery, synthesis, and rapid visualization — to arrive at conversations with something concrete enough to react to. The judgment is still mine.",
+    link: { label: "Read more", href: "/projects#ai-philosophy" },
   },
 ];
 
@@ -113,12 +121,19 @@ export function HowIWork() {
                       transition={{ duration: 0.2, ease: "easeInOut" }}
                       style={{ overflow: "hidden" }}
                     >
-                      <p
-                        className="pb-5 pl-12 md:pl-[5.5rem] pr-6 text-sm leading-relaxed"
-                        style={{ color: "#666666" }}
-                      >
-                        {item.description}
-                      </p>
+                      <div className="pb-5 pl-12 md:pl-[5.5rem] pr-6">
+                        <p className="text-sm leading-relaxed" style={{ color: "#666666" }}>
+                          {item.description}
+                        </p>
+                        {item.link && (
+                          <a
+                            href={item.link.href}
+                            className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
+                          >
+                            {item.link.label} →
+                          </a>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

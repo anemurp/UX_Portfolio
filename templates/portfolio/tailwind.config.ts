@@ -16,7 +16,7 @@ const config: Config = {
         accent: "#3b82f6",
         warm: "#F0EEF8",
         navy: "#051225",
-        primary: "#5B5BD6",
+        primary: "#6B5CE7",
         coral: "#FF6B4A",
         // Footer palette
         cobalt: "#1A2FD4",
