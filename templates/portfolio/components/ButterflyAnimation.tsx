@@ -11,6 +11,8 @@ export function ButterflyAnimation() {
   const [showHint, setShowHint] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasAutoFlownRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -21,17 +23,40 @@ export function ButterflyAnimation() {
     return () => timeoutsRef.current.forEach(clearTimeout);
   }, []);
 
-  function handleClick() {
-    if (isAnimating || reducedMotion) return;
+  function startFlight() {
     setIsAnimating(true);
-    setShowHint(false);
-    if (typeof window !== "undefined") localStorage.setItem("butterfly-clicked", "1");
-
     setPhase("flapping");
     const t1 = setTimeout(() => setPhase("flying"),   400);
     const t2 = setTimeout(() => setPhase("settling"), 4400);
     const t3 = setTimeout(() => { setPhase("idle"); setIsAnimating(false); }, 5400);
     timeoutsRef.current = [t1, t2, t3];
+  }
+
+  // Fly once on its own the first time the visitor scrolls it into view,
+  // then wait for clicks after that.
+  useEffect(() => {
+    if (reducedMotion) return;
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAutoFlownRef.current) {
+          hasAutoFlownRef.current = true;
+          observer.disconnect();
+          startFlight();
+        }
+      },
+      { threshold: 0.6 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [reducedMotion]);
+
+  function handleClick() {
+    if (isAnimating || reducedMotion) return;
+    setShowHint(false);
+    if (typeof window !== "undefined") localStorage.setItem("butterfly-clicked", "1");
+    startFlight();
   }
 
   const wingR: React.CSSProperties = {
@@ -64,7 +89,7 @@ export function ButterflyAnimation() {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div ref={containerRef} className="flex flex-col items-center">
       <div onClick={handleClick} style={wrapperStyle}>
         <svg
           role="img"
