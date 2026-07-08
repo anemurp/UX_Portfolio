@@ -29,8 +29,8 @@ export function ButterflyAnimation() {
 
     setPhase("flapping");
     const t1 = setTimeout(() => setPhase("flying"),   400);
-    const t2 = setTimeout(() => setPhase("settling"), 2600);
-    const t3 = setTimeout(() => { setPhase("idle"); setIsAnimating(false); }, 3600);
+    const t2 = setTimeout(() => setPhase("settling"), 4400);
+    const t3 = setTimeout(() => { setPhase("idle"); setIsAnimating(false); }, 5400);
     timeoutsRef.current = [t1, t2, t3];
   }
 
@@ -58,7 +58,7 @@ export function ButterflyAnimation() {
     alignItems: "center",
     justifyContent: "center",
     animation: reducedMotion ? "none"
-      : phase === "flying" ? "flyAround 2s ease-in-out"
+      : phase === "flying" ? "flyAround 4s ease-in-out"
       : phase === "idle"   ? "butterfly-float 3s ease-in-out infinite"
       : "none",
   };
