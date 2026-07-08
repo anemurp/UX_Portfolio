@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 const PURPLE = "#6B5CE7"; // used for the callout card title
 
 // --- Double Diamond diagram ------------------------------------------------
-// Discover (red) and Define (pink) form the first diamond, Develop is the big
-// layered-purple second diamond (AI-led light → human-led dark), and Deliver
-// (blue) closes it. Click any phase to reveal the matching copy below.
+// Two equal diamonds meeting at x=410. Discover (red) and Define (pink) form
+// the first; Develop (layered purple, AI-led light → human-led dark) and
+// Deliver (blue) form the second. Click any phase to reveal the copy below.
 
 const CALLOUTS: Record<string, { name: string; callout: string }> = {
   discover: {
@@ -60,29 +60,29 @@ function DoubleDiamond() {
         <desc>Double Diamond structure with Discover in red, Define in pink, Develop as layered purple triangles, and Deliver in blue. Labels outside shapes along diagonal edges, Problem and Solution labels at the far ends.</desc>
 
         <g className="phase" id="ph-discover" onClick={() => toggle('discover')} style={{ cursor: 'pointer' }}>
-          <polygon points="80,250 170,215 170,285" fill="#E63946" />
+          <polygon points="80,250 245,85 245,415" fill="#E63946" />
         </g>
         <g className="phase" id="ph-define" onClick={() => toggle('define')} style={{ cursor: 'pointer' }}>
-          <polygon points="170,215 260,250 170,285" fill="#FF3D81" />
+          <polygon points="245,85 410,250 245,415" fill="#FF3D81" />
         </g>
-        <polygon points="80,250 170,215 260,250 170,285" fill="none" stroke="#1a1a2e" strokeWidth="1.5" opacity="0.12" />
+        <polygon points="80,250 245,85 410,250 245,415" fill="none" stroke="#1a1a2e" strokeWidth="1.5" opacity="0.12" />
 
         <g className="phase" id="ph-develop" onClick={() => toggle('develop')} style={{ cursor: 'pointer' }}>
-          <polygon points="260,250 650,60 650,440" fill="#CECBF6" />
-          <polygon points="260,250 650,92 650,408" fill="#AFA9EC" />
-          <polygon points="260,250 650,124 650,376" fill="#8B82E0" />
-          <polygon points="260,250 650,156 650,344" fill="#534AB7" />
-          <polygon points="260,250 650,188 650,312" fill="#3C3489" />
+          <polygon points="410,250 575,85 575,415" fill="#CECBF6" />
+          <polygon points="410,250 575,113 575,387" fill="#AFA9EC" />
+          <polygon points="410,250 575,141 575,359" fill="#8B82E0" />
+          <polygon points="410,250 575,168 575,332" fill="#534AB7" />
+          <polygon points="410,250 575,196 575,304" fill="#3C3489" />
         </g>
         <g className="phase" id="ph-deliver" onClick={() => toggle('deliver')} style={{ cursor: 'pointer' }}>
-          <polygon points="650,60 740,250 650,440" fill="#2D7FF9" />
+          <polygon points="575,85 740,250 575,415" fill="#2D7FF9" />
         </g>
-        <polygon points="260,250 650,60 740,250 650,440" fill="none" stroke="#1a1a2e" strokeWidth="1.5" opacity="0.12" />
+        <polygon points="410,250 575,85 740,250 575,415" fill="none" stroke="#1a1a2e" strokeWidth="1.5" opacity="0.12" />
 
-        <text x="108" y="217" textAnchor="middle" fill="#E63946" style={{ fontWeight: 700, fontSize: 15 }} transform="rotate(-23, 108, 217)">Discover</text>
-        <text x="218" y="217" textAnchor="middle" fill="#FF3D81" style={{ fontWeight: 700, fontSize: 15 }} transform="rotate(23, 218, 217)">Define</text>
-        <text x="430" y="138" textAnchor="middle" fill="#3C3489" style={{ fontWeight: 700, fontSize: 16 }} transform="rotate(-28, 430, 138)">Develop</text>
-        <text x="708" y="135" textAnchor="middle" fill="#2D7FF9" style={{ fontWeight: 700, fontSize: 15 }} transform="rotate(64, 708, 135)">Deliver</text>
+        <text x="147" y="152" textAnchor="middle" fill="#E63946" style={{ fontWeight: 700, fontSize: 15 }} transform="rotate(-45, 147, 152)">Discover</text>
+        <text x="343" y="152" textAnchor="middle" fill="#FF3D81" style={{ fontWeight: 700, fontSize: 15 }} transform="rotate(45, 343, 152)">Define</text>
+        <text x="477" y="152" textAnchor="middle" fill="#3C3489" style={{ fontWeight: 700, fontSize: 16 }} transform="rotate(-45, 477, 152)">Develop</text>
+        <text x="673" y="152" textAnchor="middle" fill="#2D7FF9" style={{ fontWeight: 700, fontSize: 15 }} transform="rotate(45, 673, 152)">Deliver</text>
 
         <circle cx="80" cy="250" r="7" fill="#1a1a2e" />
         <circle cx="740" cy="250" r="7" fill="#1a1a2e" />
