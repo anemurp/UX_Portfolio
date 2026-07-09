@@ -72,6 +72,24 @@ const COLUMNS = [
   ],
 ];
 
+// The same nine images redistributed into two height-balanced columns for
+// mobile, where the mosaic renders as a simple static grid.
+const MOBILE_COLUMNS = [
+  [
+    { src: "/about_pictures/mountain.jpeg", height: 300, position: "center 78%" },
+    { src: "/about_pictures/salt.jpeg",     height: 260 },
+    { src: "/about_pictures/arifana.jpg",  height: 300 },
+    { src: "/about_pictures/Teaching.png", height: 300 },
+  ],
+  [
+    { src: "/about_pictures/denmark.jpeg",  height: 240 },
+    { src: "/about_pictures/climbing.jpeg", height: 240 },
+    { src: "/about_pictures/Italy.jpeg",    height: 280 },
+    { src: "/about_pictures/berlin.jpeg",   height: 260 },
+    { src: "/about_pictures/sunset Small.jpeg", height: 260 },
+  ],
+];
+
 // ── Parallax config ───────────────────────────────────────────────────────────
 // How far (in px) each column slides upward over the pinned scroll. Tuned per
 // column so that when the pin ends, the third image in each column is fully
@@ -219,14 +237,22 @@ export function MosaicGrid() {
   const activeRef = useRef(false);
   const [activeTouchId, setActiveTouchId] = useState<string | null>(null);
   const [isTouch, setIsTouch] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Detect touch-only device (no hover capability)
+  // Detect touch-only devices (no hover capability) and narrow screens
   useEffect(() => {
     setIsTouch(!window.matchMedia("(hover: hover)").matches);
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Parallax scroll
+  // Parallax scroll (desktop only — mobile shows a static two-column grid)
   useEffect(() => {
+    if (isMobile) return;
+
     function tick() {
       if (!outerRef.current) return;
       const p = getProgress(outerRef.current);
@@ -255,7 +281,7 @@ export function MosaicGrid() {
       window.removeEventListener("scroll", onScroll);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [isMobile]);
 
   // Dismiss tap bubble when clicking outside the mosaic
   useEffect(() => {
@@ -264,6 +290,34 @@ export function MosaicGrid() {
     document.addEventListener("click", dismiss);
     return () => document.removeEventListener("click", dismiss);
   }, [isTouch]);
+
+  // Mobile: static two-column grid, all images visible, tap reveals bubbles.
+  if (isMobile) {
+    return (
+      <div style={{ display: "flex", gap: GAP, padding: "24px 16px 0", boxSizing: "border-box" }}>
+        {MOBILE_COLUMNS.map((images, ci) => (
+          <div
+            key={ci}
+            style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: GAP }}
+          >
+            {images.map((img, ii) => (
+              <ImageTile
+                key={`${ci}-${ii}`}
+                src={img.src}
+                height={img.height}
+                position={img.position}
+                bubble={BUBBLES[img.src]}
+                tileId={`${ci}-${ii}`}
+                activeTouchId={activeTouchId}
+                onTap={setActiveTouchId}
+                isTouch={isTouch}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div
