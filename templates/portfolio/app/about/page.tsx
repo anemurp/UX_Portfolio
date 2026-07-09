@@ -9,7 +9,7 @@ export default function AboutPage() {
     <>
       <MosaicGrid />
       <main className="mx-auto max-w-3xl px-6 pb-32 pt-0 mt-0">
-      <h1 className="text-4xl font-bold mt-[34px]">{about.heading}</h1>
+      <h1 className="text-4xl font-bold mt-[66px]">{about.heading}</h1>
       <div className="mt-8 space-y-4 text-lg text-ink/80 leading-relaxed">
         {about.paragraphs.map((p, i) => (
           <Fragment key={i}>
@@ -45,10 +45,9 @@ export default function AboutPage() {
       </div>
       <div className="mt-8">
         <a
-          href="/resume.pdf"
+          href="/resume/Anna-Design-Resume.pdf"
+          download="Anna-Murphy-Resume.pdf"
           className="inline-flex items-center gap-1.5 px-6 py-3 bg-[#6B5CE7] text-white rounded-full text-sm font-medium hover:opacity-85 transition-opacity"
-          target="_blank"
-          rel="noopener noreferrer"
         >
           Download resume ↓
         </a>
