@@ -91,18 +91,19 @@ const MOBILE_COLUMNS = [
 ];
 
 // ── Parallax config ───────────────────────────────────────────────────────────
-// How far (in px) each column slides upward over the pinned scroll. Tuned per
-// column so that when the pin ends, the third image in each column is fully
-// revealed. (All negative = all columns slide up to uncover lower rows.)
-const SPEEDS = [-350, -310, -430];
+// Visible height of the pinned mosaic. The speeds below are tuned so every
+// column's last image ends exactly at this line when the pin finishes, so
+// there's no dead space between the mosaic and the content below it.
+const REVEAL_HEIGHT = 720;
 // Nudge every column down a little so the top of the first images isn't clipped.
+// Each column's slide distance is computed at runtime from the container's
+// actual height, so the last image always lands exactly at the bottom edge —
+// fully revealed on every screen size.
 const TOP_OFFSET = 24;
-const INITIAL_Y = SPEEDS.map((s) => (s > 0 ? -s : 0) + TOP_OFFSET);
-// How many pixels of scrolling the mosaic stays pinned for while it reveals the
-// next level of images. Bigger = the mosaic stays sticky longer.
-const PIN_SCROLL = 600;
-// Height of the sticky navbar above the mosaic (Tailwind h-14 = 56px). The
-// mosaic pins right below it so it sticks from the very first scroll.
+// How many pixels of page scrolling the reveal is spread across. Smaller =
+// the bottom images arrive sooner, while the mosaic is still front and center.
+const REVEAL_DISTANCE = 220;
+// Height of the sticky navbar above the mosaic (Tailwind h-14 = 56px).
 const NAV_OFFSET = 56;
 const GAP = 12;
 const DESKTOP_BUBBLE_W = 240;
@@ -221,12 +222,11 @@ function ImageTile({
 }
 
 // ── Parallax helper ───────────────────────────────────────────────────────────
-// The mosaic pins at NAV_OFFSET. As you scroll, the wrapper's top edge moves
-// from NAV_OFFSET up to NAV_OFFSET - PIN_SCROLL. We turn that into a 0 → 1
-// progress value that drives the reveal.
+// The mosaic starts just below the navbar. As it scrolls up and away, we turn
+// the distance travelled into a 0 → 1 progress value that drives the reveal.
 function getProgress(el: HTMLElement) {
   const rect = el.getBoundingClientRect();
-  return Math.max(0, Math.min(1, (NAV_OFFSET - rect.top) / PIN_SCROLL));
+  return Math.max(0, Math.min(1, (NAV_OFFSET - rect.top) / REVEAL_DISTANCE));
 }
 
 // ── MosaicGrid ────────────────────────────────────────────────────────────────
@@ -256,8 +256,12 @@ export function MosaicGrid() {
     function tick() {
       if (!outerRef.current) return;
       const p = getProgress(outerRef.current);
-      colRefs.current.forEach((col, i) => {
-        if (col) col.style.transform = `translateY(${INITIAL_Y[i] + p * SPEEDS[i]}px)`;
+      const boxH = outerRef.current.clientHeight;
+      colRefs.current.forEach((col) => {
+        if (!col) return;
+        // End position puts the column's bottom flush with the box's bottom.
+        const end = boxH - col.offsetHeight;
+        col.style.transform = `translateY(${TOP_OFFSET + p * (end - TOP_OFFSET)}px)`;
       });
     }
 
@@ -323,32 +327,16 @@ export function MosaicGrid() {
     <div
       ref={outerRef}
       style={{
-        // Tall "scroll track" — gives the page extra scroll distance to spend
-        // while the mosaic below stays pinned and reveals more images.
+        // The mosaic scrolls with the page; the column reveal is driven by
+        // how far it has scrolled (see getProgress). On short screens fall
+        // back to the space below the navbar so it never overflows the fold.
         position: "relative",
-        // Inner sticky height (100vh - 56px nav) + PIN_SCROLL (600px reveal),
-        // so the mosaic unpins exactly when the third row finishes revealing.
-        height: "calc(100vh + 544px)",
-      }}
-    >
-    <div
-      style={{
-        // The actual mosaic: sticks just below the navbar while you scroll
-        // through the track above, so it's pinned from the very first scroll.
-        position: "sticky",
-        top: NAV_OFFSET,
-        height: "calc(100vh - 56px)",
+        height: `min(${REVEAL_HEIGHT}px, calc(100vh - ${NAV_OFFSET}px))`,
         overflow: "hidden",
         display: "flex",
         gap: GAP,
         padding: "0 16px",
         boxSizing: "border-box",
-        // Fade just the bottom ~24px of the mosaic to transparent so the images
-        // dissolve subtly into the page background.
-        WebkitMaskImage:
-          "linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%)",
-        maskImage:
-          "linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%)",
       }}
     >
       {COLUMNS.map((images, ci) => (
@@ -360,7 +348,7 @@ export function MosaicGrid() {
               flexDirection: "column",
               gap: GAP,
               willChange: "transform",
-              transform: `translateY(${INITIAL_Y[ci]}px)`,
+              transform: `translateY(${TOP_OFFSET}px)`,
             }}
           >
             {images.map((img, ii) => (
@@ -379,7 +367,6 @@ export function MosaicGrid() {
           </div>
         </div>
       ))}
-    </div>
     </div>
   );
 }
