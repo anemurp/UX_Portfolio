@@ -17,9 +17,22 @@ export type Section = {
   label: string;
   heading: string;
   body: string; // separate paragraphs with a blank line (\n\n)
-  bullets?: Array<{ title: string; text: string }>;
+  bullets?: Array<{
+    title: string;
+    text: string;
+    image?: string;
+    imageSize?: "sm" | "md"; // cap the bullet image width: sm ≈ half, md ≈ two-thirds
+    images?: string[];
+  }>;
   pullQuote?: string;
+  // Images inside the text flow: entry 1 appears after paragraph 1, entry 2
+  // after paragraph 2, etc. Use null to skip a paragraph; an entry can also
+  // be a list of images to stack after that paragraph.
+  bodyImages?: Array<string | string[] | null>;
   image?: string;
+  // Stacked gallery — takes priority over image. Set removeBg: true on an
+  // entry to visually blend a white background into the page.
+  images?: Array<{ src: string; removeBg?: boolean }>;
   layout: "left" | "right" | "full" | "dark";
 };
 
@@ -60,7 +73,7 @@ export const caseStudies: CaseStudy[] = [
       { value: "68%", label: "Increase in student engagement" },
       { value: "16", label: "Prototypes tested across K–8" },
     ],
-    fullWidthImage: "",
+    fullWidthImage: "/case-studies/ReadingLabs_CaseStudy_Assets/solution.avif",
     framingHeading:
       "What does motivation look like when the teacher isn't in the room?",
     framingBody:
@@ -75,6 +88,8 @@ export const caseStudies: CaseStudy[] = [
           {
             title: "Faithful to what already worked.",
             text: "Teachers and students already knew and trusted the color-band system. The challenge wasn't inventing something new, it was translating an experience people loved into a digital interface without losing what made it recognizable and trustworthy in the first place.",
+            image: "/case-studies/ReadingLabs_CaseStudy_Assets/readinglabschart.png",
+            imageSize: "sm",
           },
           {
             title: "One interface, opposite audiences.",
@@ -85,8 +100,9 @@ export const caseStudies: CaseStudy[] = [
             text: "The interface had to supply its own encouraging moments, like noticing progress or marking a milestone, for students using it independently, without becoming redundant or hollow for students still working alongside a teacher.",
           },
         ],
+        bodyImages: ["/case-studies/ReadingLabs_CaseStudy_Assets/physical-sra.png"],
         image: "",
-        layout: "right",
+        layout: "full",
       },
       {
         id: "the-research",
@@ -94,14 +110,25 @@ export const caseStudies: CaseStudy[] = [
         heading: "Seven stakeholder groups, twelve schools, one insight",
         body: "Early usability sessions surfaced a counterintuitive finding: students don't engage with skills, they engage with content. Even skilled 6th graders couldn't articulate that they were 'identifying problem and solution,' despite being told repeatedly. The instructional language simply didn't register as meaningful to them.\n\nA parallel finding reshaped the whole motivation model: when ranked by what actually made students feel accomplished, progress bars came in last. Students cared about content mastery and forward movement through a story, not an abstract fill-meter.",
         pullQuote: "This you actually learn.",
-        image: "",
+        images: [
+          { src: "/case-studies/ReadingLabs_CaseStudy_Assets/gamification-taxonomy.avif", removeBg: true },
+          { src: "/case-studies/ReadingLabs_CaseStudy_Assets/goal-setting-theory.avif" },
+        ],
         layout: "left",
       },
       {
         id: "the-process",
         label: "The Process",
         heading: "Twenty-five dashboards, two navigation patterns, one winner",
-        body: "Research pointed at a clear problem: progress bars weren't landing, and instructional language wasn't registering. But the path from insight to interface took real iteration. Early dashboard concepts went through 25 rounds before the current structure held up in testing. Navigation was one of the harder calls: should students scroll through a long passage, or move through discrete pages? We prototyped both and tested pill-based pagination against continuous scroll directly with students. Pagination won, keeping cognitive load lower for readers already working independently for the first time.\n\nNot every idea survived contact with real students. Early sketches for the 'My Page' progress hub included a badge-collection system, sketched out on paper before being deprioritized in favor of the simpler star-tracking model that better matched what testing showed students actually responded to.",
+        body: "Research pointed at a clear problem: progress bars weren't landing, and instructional language wasn't registering. But the path from insight to interface took real iteration. Early dashboard concepts went through 25 rounds before the current structure held up in testing.\n\nNavigation was one of the harder calls: should students scroll through a long passage, or move through discrete pages? We prototyped both and tested pill-based pagination against continuous scroll directly with students. Pagination won, keeping cognitive load lower for readers already working independently for the first time.\n\nNot every idea survived contact with real students. Early sketches for the 'My Page' progress hub included a badge-collection system, sketched out on paper before being deprioritized in favor of the simpler star-tracking model that better matched what testing showed students actually responded to.",
+        bodyImages: [
+          "/case-studies/ReadingLabs_CaseStudy_Assets/dashboard-exploration.avif",
+          "/case-studies/ReadingLabs_CaseStudy_Assets/question.jpg",
+          [
+            "/case-studies/ReadingLabs_CaseStudy_Assets/mypagesketches.avif",
+            "/case-studies/ReadingLabs_CaseStudy_Assets/mypageiterations.avif",
+          ],
+        ],
         image: "",
         layout: "full",
       },
@@ -114,18 +141,29 @@ export const caseStudies: CaseStudy[] = [
           {
             title: "Ownership replaced the old ritual.",
             text: "Instead of a teacher handing a student the next card, students choose their own interests at onboarding, populating a library of readings selected specifically for them. That sense of choice became the digital stand-in for the trust the physical system used to carry.",
+            image: "/case-studies/ReadingLabs_CaseStudy_Assets/interests.avif",
           },
           {
             title: "The color-band system survived, restructured for solo use.",
             text: "Progress still moves through the same familiar bands, but now surfaces through stars, earned only at a real proficiency threshold, not for simply finishing, so advancement still reads as forward movement rather than a hollow checkbox.",
+            images: [
+              "/case-studies/ReadingLabs_CaseStudy_Assets/stars.avif",
+              "/case-studies/ReadingLabs_CaseStudy_Assets/library.avif",
+            ],
           },
           {
             title: "Motivation got built into the moments themselves.",
             text: "Small celebration interstitials mark each transition, standing in for the encouragement a teacher would normally give in real time, present whether a student is working independently or alongside a class.",
+            images: [
+              "/case-studies/ReadingLabs_CaseStudy_Assets/interstitial2.avif",
+              "/case-studies/ReadingLabs_CaseStudy_Assets/interstial-nobg.png",
+            ],
           },
           {
             title: "My Page made progress visible again.",
             text: "The old system let students see a physical stack of completed cards, tangible proof of progress. My Page rebuilds that same feeling digitally: a personal view of stats, levels completed, and stories finished, so progress stays visible even without a teacher tracking it for them.",
+            image: "/case-studies/ReadingLabs_CaseStudy_Assets/my-page.png",
+            imageSize: "md",
           },
         ],
         image: "",
@@ -140,8 +178,8 @@ export const caseStudies: CaseStudy[] = [
       },
       {
         id: "three-things",
-        label: "Three things I'd carry into the next project",
-        heading: "What I'd do differently",
+        label: "Key learnings",
+        heading: "What I took away from this project",
         body: "",
         bullets: [
           {

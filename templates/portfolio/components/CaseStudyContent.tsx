@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { caseStudies } from "../data/case-studies";
@@ -168,6 +168,18 @@ function MobileTOC({
   );
 }
 
+// Readable alt text from an image filename, e.g. "goal-setting-theory.avif"
+// → "goal setting theory".
+// A bodyImages entry can be a single path, a list of paths, or empty.
+function toImageList(entry?: string | string[] | null): string[] {
+  return Array.isArray(entry) ? entry : entry ? [entry] : [];
+}
+
+function altFromPath(src: string): string {
+  const name = src.split("/").pop() ?? "";
+  return name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+}
+
 // ─── Section body: paragraphs + optional pull quote and bullet list ──────────
 
 function SectionBody({ section, dark = false }: { section: Section; dark?: boolean }) {
@@ -178,13 +190,23 @@ function SectionBody({ section, dark = false }: { section: Section; dark?: boole
   return (
     <>
       {paragraphs.map((p, i) => (
-        <motion.p
-          key={i}
-          variants={item}
-          className={`${textClass} text-lg leading-relaxed max-w-[60ch] ${i > 0 ? "mt-5" : ""}`}
-        >
-          {p}
-        </motion.p>
+        <Fragment key={i}>
+          <motion.p
+            variants={item}
+            className={`${textClass} text-lg leading-relaxed ${i > 0 ? "mt-5" : ""}`}
+          >
+            {p}
+          </motion.p>
+          {toImageList(section.bodyImages?.[i]).map((src) => (
+            <motion.img
+              key={src}
+              variants={item}
+              src={src}
+              alt={altFromPath(src)}
+              className="mt-6 w-full max-w-[60ch] h-auto rounded-xl"
+            />
+          ))}
+        </Fragment>
       ))}
       {section.pullQuote && (
         <motion.blockquote
@@ -195,7 +217,7 @@ function SectionBody({ section, dark = false }: { section: Section; dark?: boole
         </motion.blockquote>
       )}
       {section.bullets && (
-        <motion.ul variants={item} className="mt-6 space-y-5 max-w-[60ch]">
+        <motion.ul variants={item} className="mt-6 space-y-5">
           {section.bullets.map((b) => (
             <li
               key={b.title}
@@ -203,7 +225,21 @@ function SectionBody({ section, dark = false }: { section: Section; dark?: boole
                 dark ? "border-warm/25" : "border-navy/15"
               }`}
             >
-              <span className={`font-semibold ${strongClass}`}>{b.title}</span> {b.text}
+              <p className={`text-lg leading-relaxed ${textClass}`}>
+                <span className={`font-semibold ${strongClass}`}>{b.title}</span> {b.text}
+              </p>
+              {b.image && (
+                <img
+                  src={b.image}
+                  alt={b.title}
+                  className={`mt-4 w-full h-auto rounded-xl ${
+                    b.imageSize === "sm" ? "max-w-sm mx-auto" : b.imageSize === "md" ? "max-w-md mx-auto" : ""
+                  }`}
+                />
+              )}
+              {b.images?.map((src) => (
+                <img key={src} src={src} alt={altFromPath(src)} className="mt-4 w-full h-auto rounded-xl" />
+              ))}
             </li>
           ))}
         </motion.ul>
@@ -229,13 +265,13 @@ function SectionBlock({ section }: { section: Section }) {
         <motion.p variants={item} className="text-xs font-bold uppercase tracking-[0.15em] text-[#6B5CE7] mb-4">
           {section.label}
         </motion.p>
-        <motion.h2 variants={item} className="text-3xl md:text-4xl font-bold leading-tight max-w-2xl mb-5">
+        <motion.h2 variants={item} className="text-warm text-3xl md:text-4xl font-bold leading-tight mb-5">
           {section.heading}
         </motion.h2>
         <SectionBody section={section} dark />
         {section.image && (
           <motion.div variants={item} className="mt-12">
-            <BrowserMockup image={section.image} label={section.label} />
+            <img src={section.image} alt={section.heading} className="w-full h-auto rounded-xl" />
           </motion.div>
         )}
       </motion.div>
@@ -256,13 +292,13 @@ function SectionBlock({ section }: { section: Section }) {
         <motion.p variants={item} className="text-xs font-bold uppercase tracking-[0.15em] text-[#6B5CE7] mb-4">
           {section.label}
         </motion.p>
-        <motion.h2 variants={item} className="text-3xl md:text-4xl font-bold text-navy leading-tight max-w-2xl mb-5">
+        <motion.h2 variants={item} className="text-3xl md:text-4xl font-bold text-navy leading-tight mb-5">
           {section.heading}
         </motion.h2>
         <SectionBody section={section} />
         {section.image && (
           <motion.div variants={item} className="mt-12">
-            <BrowserMockup image={section.image} label={section.label} />
+            <img src={section.image} alt={section.heading} className="w-full h-auto rounded-xl" />
           </motion.div>
         )}
       </motion.div>
@@ -286,7 +322,22 @@ function SectionBlock({ section }: { section: Section }) {
         {imageOnLeft ? (
           <>
             <motion.div variants={item} className="flex items-center justify-center">
-              <PhoneMockup image={section.image} label={section.label} />
+              {section.images?.length ? (
+                <div className="flex w-full flex-col gap-4">
+                  {section.images.map((im) => (
+                    <img
+                      key={im.src}
+                      src={im.src}
+                      alt={altFromPath(im.src)}
+                      className={`w-full h-auto rounded-xl ${im.removeBg ? "mix-blend-multiply" : ""}`}
+                    />
+                  ))}
+                </div>
+              ) : section.image ? (
+                <img src={section.image} alt={section.heading} className="w-full h-auto rounded-xl" />
+              ) : (
+                <PhoneMockup label={section.label} />
+              )}
             </motion.div>
             <div>
               <motion.p variants={item} className="text-xs font-bold uppercase tracking-[0.15em] text-[#6B5CE7] mb-4">
@@ -310,7 +361,22 @@ function SectionBlock({ section }: { section: Section }) {
               <SectionBody section={section} />
             </div>
             <motion.div variants={item} className="flex items-center justify-center">
-              <PhoneMockup image={section.image} label={section.label} />
+              {section.images?.length ? (
+                <div className="flex w-full flex-col gap-4">
+                  {section.images.map((im) => (
+                    <img
+                      key={im.src}
+                      src={im.src}
+                      alt={altFromPath(im.src)}
+                      className={`w-full h-auto rounded-xl ${im.removeBg ? "mix-blend-multiply" : ""}`}
+                    />
+                  ))}
+                </div>
+              ) : section.image ? (
+                <img src={section.image} alt={section.heading} className="w-full h-auto rounded-xl" />
+              ) : (
+                <PhoneMockup label={section.label} />
+              )}
             </motion.div>
           </>
         )}
@@ -492,24 +558,28 @@ export function CaseStudyContent({ cs }: { cs: CaseStudy }) {
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 max-w-3xl pt-16 lg:pt-20">
+        <main className="flex-1 min-w-0 pt-16 lg:pt-20">
 
           {/* ── FULL-WIDTH IMAGE ─────────────────────────────── */}
           {cs.fullWidthImage !== undefined && (
             <motion.div
-              className="mb-20"
+              className="mb-[54px]"
               variants={item}
               initial="hidden"
               whileInView="visible"
               viewport={VIEWPORT}
             >
-              <BrowserMockup image={cs.fullWidthImage} label={`${cs.title} — full view`} />
+              {cs.fullWidthImage ? (
+                <img src={cs.fullWidthImage} alt={`${cs.title} — overview`} className="w-full h-auto rounded-xl" />
+              ) : (
+                <BrowserMockup label={`${cs.title} — full view`} />
+              )}
             </motion.div>
           )}
 
           {/* ── FRAMING ──────────────────────────────────────── */}
           <motion.div
-            className="text-center border-y border-navy/10 py-16 mb-4"
+            className="text-center border-b border-navy/10 pt-0 pb-16 mb-4"
             variants={container}
             initial="hidden"
             whileInView="visible"
