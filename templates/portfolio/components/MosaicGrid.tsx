@@ -41,6 +41,16 @@ const BUBBLES: Record<string, BubbleConfig> = {
     bg: "#00B4D8",
     fg: "#ffffff",
   },
+  "/about_pictures/Teaching.png": {
+    text: "I used to be a middle and high school teacher for 5 years before becoming a UX designer",
+    bg: "#E8392A",
+    fg: "#ffffff",
+  },
+  "/about_pictures/berlin.jpeg": {
+    text: "I live in Berlin, in Prenzlauer Berg. I'm learning German and currently am in a B2 intensive course.",
+    bg: "#0D7A6B",
+    fg: "#ffffff",
+  },
 };
 
 // ── Column data ───────────────────────────────────────────────────────────────
@@ -49,19 +59,16 @@ const COLUMNS = [
     { src: "/about_pictures/mountain.jpeg", height: 300, position: "center 78%" },
     { src: "/about_pictures/denmark.jpeg",  height: 240 },
     { src: "/about_pictures/sunset Small.jpeg", height: 260 },
-    { src: "/about_pictures/mountain.jpeg", height: 300, position: "center 78%" },
   ],
   [
     { src: "/about_pictures/salt.jpeg",     height: 260 },
     { src: "/about_pictures/climbing.jpeg", height: 240 },
-    { src: "/about_pictures/salt.jpeg",     height: 260 },
-    { src: "/about_pictures/climbing.jpeg", height: 240 },
+    { src: "/about_pictures/berlin.jpeg",   height: 260 },
   ],
   [
     { src: "/about_pictures/arifana.jpg",  height: 300 },
     { src: "/about_pictures/Italy.jpeg",    height: 280 },
-    { src: "/about_pictures/arifana.jpg",  height: 300 },
-    { src: "/about_pictures/Italy.jpeg",    height: 280 },
+    { src: "/about_pictures/Teaching.png", height: 300 },
   ],
 ];
 
