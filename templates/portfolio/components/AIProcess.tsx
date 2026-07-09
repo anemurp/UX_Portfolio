@@ -5,6 +5,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const PURPLE = "#6B5CE7"; // used for the callout card title
 
+// Soft translucent version of a segment's fill, used for its hover glow.
+function glowColor(hex: string, alpha = 0.45): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+// Inline style for a phase group: pointer cursor plus the segment's glow
+// color as a CSS variable that the hover rules in globals.css pick up.
+function phaseStyle(hex: string): React.CSSProperties {
+  return { cursor: "pointer", "--phase-glow": glowColor(hex) } as React.CSSProperties;
+}
+
 // --- Double Diamond diagram ------------------------------------------------
 // Two equal diamonds meeting at x=410. Discover (red) and Define (pink) form
 // the first; Develop (layered purple, AI-led light → human-led dark) and
@@ -35,8 +47,12 @@ const CALLOUTS: Record<string, { name: string; callout: string }> = {
 
 function DoubleDiamond() {
   const [active, setActive] = useState<string | null>(null);
+  const [demoPhase, setDemoPhase] = useState<string | null>(null);
   const current = active ? CALLOUTS[active] : null;
   const calloutRef = useRef<HTMLDivElement>(null);
+  const diagramRef = useRef<HTMLDivElement>(null);
+  const hasDemoedRef = useRef(false);
+  const demoTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const toggle = (id: string) => setActive(active === id ? null : id);
 
@@ -47,34 +63,63 @@ function DoubleDiamond() {
     }
   }, [active]);
 
+  // One-time demo: the first time the diagram scrolls into view, sweep a
+  // highlight across the four phases to show they're interactive.
+  useEffect(() => {
+    const el = diagramRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasDemoedRef.current) {
+          hasDemoedRef.current = true;
+          observer.disconnect();
+          const order = ["discover", "define", "develop", "deliver"];
+          order.forEach((id, i) => {
+            demoTimeoutsRef.current.push(setTimeout(() => setDemoPhase(id), i * 600));
+          });
+          demoTimeoutsRef.current.push(
+            setTimeout(() => setDemoPhase(null), order.length * 600)
+          );
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      demoTimeoutsRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const phaseClass = (id: string) => `phase${demoPhase === id ? " phase-demo" : ""}`;
+
   return (
-    <div>
+    <div ref={diagramRef}>
       <svg
         width="100%"
-        viewBox="0 0 820 460"
+        viewBox="0 70 820 390"
         preserveAspectRatio="xMidYMid meet"
-        className="h-auto w-full"
+        className="h-auto w-full overflow-visible"
         role="img"
+        aria-label="Double Diamond diagram showing Discover in red, Define in pink, Develop as layered purple triangles, and Deliver in blue. Click a phase to reveal its description."
       >
-        <title>Double Diamond diagram showing Discover, Define, Develop, Deliver</title>
-        <desc>Double Diamond structure with Discover in red, Define in pink, Develop as layered purple triangles, and Deliver in blue. Labels outside shapes along diagonal edges, Problem and Solution labels at the far ends.</desc>
-
-        <g className="phase" id="ph-discover" onClick={() => toggle('discover')} style={{ cursor: 'pointer' }}>
+        <g className={phaseClass('discover')} id="ph-discover" onClick={() => toggle('discover')} style={phaseStyle("#E63946")}>
           <polygon points="80,250 245,85 245,415" fill="#E63946" />
         </g>
-        <g className="phase" id="ph-define" onClick={() => toggle('define')} style={{ cursor: 'pointer' }}>
+        <g className={phaseClass('define')} id="ph-define" onClick={() => toggle('define')} style={phaseStyle("#FF3D81")}>
           <polygon points="245,85 410,250 245,415" fill="#FF3D81" />
         </g>
         <polygon points="80,250 245,85 410,250 245,415" fill="none" stroke="#1a1a2e" strokeWidth="1.5" opacity="0.12" />
 
-        <g className="phase" id="ph-develop" onClick={() => toggle('develop')} style={{ cursor: 'pointer' }}>
+        <g className={phaseClass('develop')} id="ph-develop" onClick={() => toggle('develop')} style={phaseStyle("#8B82E0")}>
           <polygon points="410,250 575,85 575,415" fill="#CECBF6" />
           <polygon points="410,250 575,113 575,387" fill="#AFA9EC" />
           <polygon points="410,250 575,141 575,359" fill="#8B82E0" />
           <polygon points="410,250 575,168 575,332" fill="#534AB7" />
           <polygon points="410,250 575,196 575,304" fill="#3C3489" />
         </g>
-        <g className="phase" id="ph-deliver" onClick={() => toggle('deliver')} style={{ cursor: 'pointer' }}>
+        <g className={phaseClass('deliver')} id="ph-deliver" onClick={() => toggle('deliver')} style={phaseStyle("#2D7FF9")}>
           <polygon points="575,85 740,250 575,415" fill="#2D7FF9" />
         </g>
         <polygon points="410,250 575,85 740,250 575,415" fill="none" stroke="#1a1a2e" strokeWidth="1.5" opacity="0.12" />
@@ -129,7 +174,21 @@ export function AIProcess() {
         prototypes than time would ever have allowed before.
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex items-start justify-center gap-3">
+        <svg width="28" height="44" viewBox="0 0 40 62" fill="none" aria-hidden="true" className="shrink-0 text-subtle">
+          <path d="M 34 4 Q 8 14, 10 54" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <path d="M 4 46 L 10 54 L 16 47" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+        <p className="text-xs text-subtle text-center">
+          Click each phase to learn more.
+        </p>
+        <svg width="28" height="44" viewBox="0 0 40 62" fill="none" aria-hidden="true" className="shrink-0 text-subtle -scale-x-100">
+          <path d="M 34 4 Q 8 14, 10 54" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <path d="M 4 46 L 10 54 L 16 47" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </div>
+
+      <div className="mt-1">
         <DoubleDiamond />
       </div>
     </section>

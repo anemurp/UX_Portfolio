@@ -211,6 +211,27 @@ p {
   to   { width: 100% }
 }
 
+/* Double Diamond phases: brighten + grow slightly on hover, and during
+   the one-time demo sweep (.phase-demo). Hover is limited to devices
+   that actually have one, so taps on mobile don't leave a stuck highlight. */
+.phase {
+  transition: filter 0.2s ease, transform 0.2s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* --phase-glow is set per segment as an inline CSS variable — a soft
+   translucent version of that segment's own fill color. */
+.phase-demo {
+  filter: brightness(1.15) drop-shadow(0 0 6px var(--phase-glow)) drop-shadow(0 0 18px var(--phase-glow));
+  transform: scale(1.05);
+}
+@media (hover: hover) {
+  .phase:hover {
+    filter: brightness(1.15) drop-shadow(0 0 6px var(--phase-glow)) drop-shadow(0 0 18px var(--phase-glow));
+    transform: scale(1.05);
+  }
+}
+
 @keyframes butterfly-float {
   0%, 100% { transform: translateY(0px)   rotate(-2deg); }
   50%       { transform: translateY(-10px) rotate(2deg);  }
