@@ -524,18 +524,13 @@ export function CaseStudyContent({ cs }: { cs: CaseStudy }) {
               <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#999", textAlign: "center", marginBottom: "24px" }}>
                 Key Results
               </p>
-              <div style={{ display: "flex" }}>
+              <div className="flex flex-col gap-8 sm:flex-row sm:gap-0">
                 {cs.metrics.map((m, i) => (
                   <div
                     key={i}
-                    style={{
-                      flex: 1,
-                      textAlign: "center",
-                      borderLeft: i > 0 ? "1px solid #E8E8E8" : undefined,
-                      padding: "0 8px",
-                    }}
+                    className={`flex-1 text-center px-2${i > 0 ? " sm:border-l sm:border-[#E8E8E8]" : ""}`}
                   >
-                    <p style={{ fontSize: "44px", fontWeight: 800, color: "#0F0F0F", lineHeight: 1 }}>{m.value}</p>
+                    <p className="text-4xl sm:text-[44px] font-extrabold leading-none text-[#0F0F0F]">{m.value}</p>
                     <p style={{ fontSize: "13px", color: "#999", textAlign: "center", lineHeight: 1.4, marginTop: "8px", maxWidth: "140px", margin: "8px auto 0" }}>{m.label}</p>
                   </div>
                 ))}
