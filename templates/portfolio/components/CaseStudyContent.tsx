@@ -168,6 +168,50 @@ function MobileTOC({
   );
 }
 
+// ─── Section body: paragraphs + optional pull quote and bullet list ──────────
+
+function SectionBody({ section, dark = false }: { section: Section; dark?: boolean }) {
+  const textClass = dark ? "text-warm/70" : "text-navy/70";
+  const strongClass = dark ? "text-warm" : "text-navy";
+  const paragraphs = section.body.split("\n\n").filter((p) => p.trim() !== "");
+
+  return (
+    <>
+      {paragraphs.map((p, i) => (
+        <motion.p
+          key={i}
+          variants={item}
+          className={`${textClass} text-lg leading-relaxed max-w-[60ch] ${i > 0 ? "mt-5" : ""}`}
+        >
+          {p}
+        </motion.p>
+      ))}
+      {section.pullQuote && (
+        <motion.blockquote
+          variants={item}
+          className={`mt-8 border-l-4 border-[#6B5CE7] pl-5 text-xl md:text-2xl font-semibold leading-snug ${strongClass}`}
+        >
+          &ldquo;{section.pullQuote}&rdquo;
+        </motion.blockquote>
+      )}
+      {section.bullets && (
+        <motion.ul variants={item} className="mt-6 space-y-5 max-w-[60ch]">
+          {section.bullets.map((b) => (
+            <li
+              key={b.title}
+              className={`${textClass} text-lg leading-relaxed pl-5 border-l-2 ${
+                dark ? "border-warm/25" : "border-navy/15"
+              }`}
+            >
+              <span className={`font-semibold ${strongClass}`}>{b.title}</span> {b.text}
+            </li>
+          ))}
+        </motion.ul>
+      )}
+    </>
+  );
+}
+
 // ─── Section blocks ──────────────────────────────────────────────────────────
 
 function SectionBlock({ section }: { section: Section }) {
@@ -188,9 +232,7 @@ function SectionBlock({ section }: { section: Section }) {
         <motion.h2 variants={item} className="text-3xl md:text-4xl font-bold leading-tight max-w-2xl mb-5">
           {section.heading}
         </motion.h2>
-        <motion.p variants={item} className="text-warm/70 text-lg leading-relaxed max-w-[60ch]">
-          {section.body}
-        </motion.p>
+        <SectionBody section={section} dark />
         {section.image && (
           <motion.div variants={item} className="mt-12">
             <BrowserMockup image={section.image} label={section.label} />
@@ -217,9 +259,7 @@ function SectionBlock({ section }: { section: Section }) {
         <motion.h2 variants={item} className="text-3xl md:text-4xl font-bold text-navy leading-tight max-w-2xl mb-5">
           {section.heading}
         </motion.h2>
-        <motion.p variants={item} className="text-navy/70 text-lg leading-relaxed max-w-[60ch]">
-          {section.body}
-        </motion.p>
+        <SectionBody section={section} />
         {section.image && (
           <motion.div variants={item} className="mt-12">
             <BrowserMockup image={section.image} label={section.label} />
@@ -255,9 +295,7 @@ function SectionBlock({ section }: { section: Section }) {
               <motion.h2 variants={item} className="text-2xl md:text-3xl font-bold text-navy leading-tight mb-4">
                 {section.heading}
               </motion.h2>
-              <motion.p variants={item} className="text-navy/70 text-lg leading-relaxed">
-                {section.body}
-              </motion.p>
+              <SectionBody section={section} />
             </div>
           </>
         ) : (
@@ -269,9 +307,7 @@ function SectionBlock({ section }: { section: Section }) {
               <motion.h2 variants={item} className="text-2xl md:text-3xl font-bold text-navy leading-tight mb-4">
                 {section.heading}
               </motion.h2>
-              <motion.p variants={item} className="text-navy/70 text-lg leading-relaxed">
-                {section.body}
-              </motion.p>
+              <SectionBody section={section} />
             </div>
             <motion.div variants={item} className="flex items-center justify-center">
               <PhoneMockup image={section.image} label={section.label} />

@@ -16,7 +16,9 @@ export type Section = {
   id: string;
   label: string;
   heading: string;
-  body: string;
+  body: string; // separate paragraphs with a blank line (\n\n)
+  bullets?: Array<{ title: string; text: string }>;
+  pullQuote?: string;
   image?: string;
   layout: "left" | "right" | "full" | "dark";
 };
@@ -68,7 +70,21 @@ export const caseStudies: CaseStudy[] = [
         id: "the-problem",
         label: "The Problem",
         heading: "A 60-year-old product built around teacher motivation",
-        body: "The original Reading Labs system relied on teachers to assign work, track progress, and provide encouragement. The digital version inherited that structure wholesale — students logged in, got assigned a passage, and submitted answers with no feedback beyond a score. Engagement data showed most students completed one or two sessions and stopped. The product wasn't failing technically; it was failing motivationally.",
+        body: "SRA Reading Labs began as a box of color-coded reading cards used by teachers for 60 years. Students might use it in the classroom with a teacher guiding them, or independently at home, and the physical product had always assumed the former. Digitizing it meant designing motivation, pacing, and encouragement into the product itself, so the experience held up whether or not a teacher was in the room.\n\nThree tensions shaped every decision that followed:",
+        bullets: [
+          {
+            title: "Faithful to what already worked.",
+            text: "Teachers and students already knew and trusted the color-band system. The challenge wasn't inventing something new, it was translating an experience people loved into a digital interface without losing what made it recognizable and trustworthy in the first place.",
+          },
+          {
+            title: "One interface, opposite audiences.",
+            text: "The experience spanned K–8. A pagination pattern that felt right to a 3rd grader risked feeling babyish to an 8th grader, and this had to be resolved with testing, not intuition.",
+          },
+          {
+            title: "Motivation that can't assume a teacher is watching.",
+            text: "The interface had to supply its own encouraging moments, like noticing progress or marking a milestone, for students using it independently, without becoming redundant or hollow for students still working alongside a teacher.",
+          },
+        ],
         image: "",
         layout: "right",
       },
@@ -76,15 +92,42 @@ export const caseStudies: CaseStudy[] = [
         id: "the-research",
         label: "The Research",
         heading: "Seven stakeholder groups, twelve schools, one insight",
-        body: "I ran research across 7 stakeholder groups: students (grades 2–8), classroom teachers, curriculum directors, parents, reading specialists, school admins, and the content team. Across 40+ sessions one theme emerged: students who persisted shared a specific experience — they could see where they were going. Progress wasn't just a score; it was a visible path with a clear next step. Students without that visibility gave up faster, regardless of reading level.",
+        body: "Early usability sessions surfaced a counterintuitive finding: students don't engage with skills, they engage with content. Even skilled 6th graders couldn't articulate that they were 'identifying problem and solution,' despite being told repeatedly. The instructional language simply didn't register as meaningful to them.\n\nA parallel finding reshaped the whole motivation model: when ranked by what actually made students feel accomplished, progress bars came in last. Students cared about content mastery and forward movement through a story, not an abstract fill-meter.",
+        pullQuote: "This you actually learn.",
         image: "",
         layout: "left",
+      },
+      {
+        id: "the-process",
+        label: "The Process",
+        heading: "Twenty-five dashboards, two navigation patterns, one winner",
+        body: "Research pointed at a clear problem: progress bars weren't landing, and instructional language wasn't registering. But the path from insight to interface took real iteration. Early dashboard concepts went through 25 rounds before the current structure held up in testing. Navigation was one of the harder calls: should students scroll through a long passage, or move through discrete pages? We prototyped both and tested pill-based pagination against continuous scroll directly with students. Pagination won, keeping cognitive load lower for readers already working independently for the first time.\n\nNot every idea survived contact with real students. Early sketches for the 'My Page' progress hub included a badge-collection system, sketched out on paper before being deprioritized in favor of the simpler star-tracking model that better matched what testing showed students actually responded to.",
+        image: "",
+        layout: "full",
       },
       {
         id: "the-solution",
         label: "The Solution",
         heading: "A motivation system grounded in self-determination theory",
-        body: "I designed a three-layer motivation system: a visible reading path showing 22 levelled stages, a personal record log so students could see their own growth over time, and a light gamification layer (reading streaks, level-up moments) that rewarded consistency rather than just correctness. I tested 16 prototypes across 8 classrooms, iterating on the balance between challenge and progress visibility. The final system increased session completion by 68% and average reading time per session by 4.2 minutes.",
+        body: "The answer took shape as a full student experience, built around four connected moves: an interest-selection step at onboarding, a library that personalizes around those interests, a set of motivational moments woven through the reading itself, and a personal stats page that made progress visible at a glance.",
+        bullets: [
+          {
+            title: "Ownership replaced the old ritual.",
+            text: "Instead of a teacher handing a student the next card, students choose their own interests at onboarding, populating a library of readings selected specifically for them. That sense of choice became the digital stand-in for the trust the physical system used to carry.",
+          },
+          {
+            title: "The color-band system survived, restructured for solo use.",
+            text: "Progress still moves through the same familiar bands, but now surfaces through stars, earned only at a real proficiency threshold, not for simply finishing, so advancement still reads as forward movement rather than a hollow checkbox.",
+          },
+          {
+            title: "Motivation got built into the moments themselves.",
+            text: "Small celebration interstitials mark each transition, standing in for the encouragement a teacher would normally give in real time, present whether a student is working independently or alongside a class.",
+          },
+          {
+            title: "My Page made progress visible again.",
+            text: "The old system let students see a physical stack of completed cards, tangible proof of progress. My Page rebuilds that same feeling digitally: a personal view of stats, levels completed, and stories finished, so progress stays visible even without a teacher tracking it for them.",
+          },
+        ],
         image: "",
         layout: "dark",
       },
@@ -92,14 +135,28 @@ export const caseStudies: CaseStudy[] = [
         id: "what-didnt-make-it",
         label: "What didn't make it and why",
         heading: "The social features we chose not to build",
-        body: "Early prototypes included peer comparison features — leaderboards, shared achievements, class challenges. They tested well with competitive students and poorly with everyone else. Students who were already behind found them demoralising; teachers worried about the classroom dynamics. We replaced them with personal-record comparisons: you versus your past self, not you versus the class. It was a harder design problem and a more defensible product decision.",
+        body: "Early explorations considered peer-comparison features: leaderboards, shared achievements, class challenges. They tested well with competitive students and poorly with everyone else. Students already behind found them demoralizing, and teachers worried about classroom dynamics. These were replaced with personal-record comparisons, you versus your past self rather than you versus the class. A harder design problem, but a more defensible product decision.",
         layout: "full",
       },
       {
         id: "three-things",
         label: "Three things I'd carry into the next project",
         heading: "What I'd do differently",
-        body: "First: involve the content team from the beginning. The reading passages themselves were a design surface I initially treated as fixed — involving the content team earlier opened up interventions I hadn't considered. Second: the 22-level structure was inherited from the physical product. Questioning it in week two instead of week ten would have saved a full sprint. Third: testing with struggling readers specifically, not just average-level students, revealed failure modes that never appeared in mainstream testing. Building that into the research protocol from the start would have surfaced the most important insights earlier.",
+        body: "",
+        bullets: [
+          {
+            title: "Legacy products are a different kind of design challenge.",
+            text: "The color-band system, the self-selection mechanic, the self-checking model: all pedagogically intentional, developed over decades of classroom use. My task was understanding it well enough to know which parts were worth preserving, which were limited only by the physical medium, and which could go further in digital. Interest selection was the clearest example of that last category. A card box couldn't adapt to who a student was; a digital product could, and making that the first meaningful interaction changed what motivation looked like throughout the entire experience.",
+          },
+          {
+            title: "Student motivation is ownership-based.",
+            text: "Designing for motivation with no teacher in the room is one of the hardest problems in EdTech, and most products solve it by borrowing game mechanics that don't actually work for learning. This pushed me back to the research: self-efficacy, goal-setting theory, what makes students persist. The finding: motivation follows ownership. When a student chooses what they read, sees only the goal directly in front of them, and gets a clear moment of 'I did it' rather than incremental progress, they keep going. That became the design principle behind every major decision, and it's also what kept stakeholders aligned when priorities competed.",
+          },
+          {
+            title: "Structured alignment matters as much as the design itself.",
+            text: "Working across seven stakeholder groups with competing priorities required a decision log of screenshots, notes, and videos, plus regular checkpoints, so the team stayed aligned without slowing the work down.",
+          },
+        ],
         layout: "full",
       },
     ],
