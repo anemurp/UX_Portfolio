@@ -224,7 +224,9 @@ export const caseStudies: CaseStudy[] = [
     framingBody: "Placeholder framing body — update with real content.",
     sections: [
       { id: "the-problem",         label: "The Problem",                           heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "right" },
+      { id: "my-role-context",     label: "My Role & Context",                     heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
       { id: "the-research",        label: "The Research",                          heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "left"  },
+      { id: "the-process",         label: "The Process",                           heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
       { id: "the-solution",        label: "The Solution",                          heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "dark"  },
       { id: "what-didnt-make-it",  label: "What didn't make it and why",           heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
       { id: "three-things",        label: "Three things I'd carry into the next project", heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
@@ -255,7 +257,9 @@ export const caseStudies: CaseStudy[] = [
     framingBody: "Placeholder framing body — update with real content.",
     sections: [
       { id: "the-problem",         label: "The Problem",                           heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "right" },
+      { id: "my-role-context",     label: "My Role & Context",                     heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
       { id: "the-research",        label: "The Research",                          heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "left"  },
+      { id: "the-process",         label: "The Process",                           heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
       { id: "the-solution",        label: "The Solution",                          heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "dark"  },
       { id: "what-didnt-make-it",  label: "What didn't make it and why",           heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
       { id: "three-things",        label: "Three things I'd carry into the next project", heading: "Placeholder heading", body: "Placeholder body — update with real content.", layout: "full"  },
