@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { caseStudies } from "../data/case-studies";
@@ -171,13 +171,43 @@ function MobileTOC({
 // Readable alt text from an image filename, e.g. "goal-setting-theory.avif"
 // → "goal setting theory".
 // A bodyImages entry can be a single path, a list of paths, or empty.
-function toImageList(entry?: string | string[] | null): string[] {
-  return Array.isArray(entry) ? entry : entry ? [entry] : [];
+// A { src, side } or { images, full } entry is rendered separately, so both
+// are excluded here.
+function toImageList(
+  entry?:
+    | string
+    | string[]
+    | { src: string; side?: boolean }
+    | { images: string[]; full?: boolean; center?: boolean }
+    | null
+): string[] {
+  if (!entry) return [];
+  if (Array.isArray(entry)) return entry;
+  if (typeof entry === "string") return [entry];
+  return [];
 }
 
 function altFromPath(src: string): string {
   const name = src.split("/").pop() ?? "";
   return name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+}
+
+// Renders **bold** markers as <strong> (styled like a bullet title: font-semibold
+// + full-opacity text color) and _italic_ markers as <em>, inside paragraph text.
+function renderInlineBold(text: string, strongClassName: string): ReactNode {
+  return text.split(/(\*\*.+?\*\*|_.+?_)/g).map((token, i) => {
+    if (token.startsWith("**") && token.endsWith("**")) {
+      return (
+        <strong key={i} className={`font-semibold ${strongClassName}`}>
+          {token.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (token.startsWith("_") && token.endsWith("_")) {
+      return <em key={i}>{token.slice(1, -1)}</em>;
+    }
+    return token;
+  });
 }
 
 // ─── Section body: paragraphs + optional pull quote and bullet list ──────────
@@ -189,25 +219,60 @@ function SectionBody({ section, dark = false }: { section: Section; dark?: boole
 
   return (
     <>
-      {paragraphs.map((p, i) => (
-        <Fragment key={i}>
-          <motion.p
-            variants={item}
-            className={`${textClass} text-lg leading-relaxed ${i > 0 ? "mt-5" : ""}`}
-          >
-            {p}
-          </motion.p>
-          {toImageList(section.bodyImages?.[i]).map((src) => (
-            <motion.img
-              key={src}
+      {paragraphs.map((p, i) => {
+        const entry = section.bodyImages?.[i];
+        const isObjectEntry = entry && typeof entry === "object" && !Array.isArray(entry);
+        const sideImage = isObjectEntry && "src" in entry ? entry.src : undefined;
+        const imageGroup = isObjectEntry && "images" in entry ? entry : undefined;
+        const isCallout = section.calloutParagraphs?.includes(i);
+
+        if (sideImage) {
+          return (
+            <motion.div
+              key={i}
               variants={item}
-              src={src}
-              alt={altFromPath(src)}
-              className="mt-6 w-full max-w-[60ch] h-auto rounded-xl"
-            />
-          ))}
-        </Fragment>
-      ))}
+              className={`grid md:grid-cols-2 gap-8 items-center ${i > 0 ? "mt-5" : ""}`}
+            >
+              <p className={`${textClass} text-lg leading-relaxed`}>{renderInlineBold(p, strongClass)}</p>
+              <img src={sideImage} alt={altFromPath(sideImage)} className="w-full h-auto rounded-xl" />
+            </motion.div>
+          );
+        }
+
+        return (
+          <Fragment key={i}>
+            <motion.p
+              variants={item}
+              className={`${textClass} text-lg leading-relaxed ${i > 0 ? "mt-5" : ""} ${
+                isCallout ? "border-l-4 border-[#6B5CE7] pl-5" : ""
+              }`}
+            >
+              {renderInlineBold(p, strongClass)}
+            </motion.p>
+            {imageGroup
+              ? imageGroup.images.map((src) => (
+                  <motion.img
+                    key={src}
+                    variants={item}
+                    src={src}
+                    alt={altFromPath(src)}
+                    className={`mt-6 h-auto rounded-xl ${imageGroup.full ? "w-full" : "w-full max-w-[60ch]"} ${
+                      imageGroup.center ? "mx-auto block" : ""
+                    }`}
+                  />
+                ))
+              : toImageList(entry).map((src) => (
+                  <motion.img
+                    key={src}
+                    variants={item}
+                    src={src}
+                    alt={altFromPath(src)}
+                    className="mt-6 w-full max-w-[60ch] h-auto rounded-xl"
+                  />
+                ))}
+          </Fragment>
+        );
+      })}
       {section.pullQuote && (
         <motion.blockquote
           variants={item}
@@ -268,6 +333,14 @@ function SectionBlock({ section }: { section: Section }) {
         <motion.h2 variants={item} className="text-warm text-3xl md:text-4xl font-bold leading-tight mb-5">
           {section.heading}
         </motion.h2>
+        {section.headingImage && (
+          <motion.img
+            variants={item}
+            src={section.headingImage}
+            alt={altFromPath(section.headingImage)}
+            className="mb-6 w-full h-auto rounded-xl"
+          />
+        )}
         <SectionBody section={section} dark />
         {section.image && (
           <motion.div variants={item} className="mt-12">
@@ -295,6 +368,14 @@ function SectionBlock({ section }: { section: Section }) {
         <motion.h2 variants={item} className="text-3xl md:text-4xl font-bold text-navy leading-tight mb-5">
           {section.heading}
         </motion.h2>
+        {section.headingImage && (
+          <motion.img
+            variants={item}
+            src={section.headingImage}
+            alt={altFromPath(section.headingImage)}
+            className="mb-6 w-full h-auto rounded-xl"
+          />
+        )}
         <SectionBody section={section} />
         {section.image && (
           <motion.div variants={item} className="mt-12">
@@ -346,6 +427,14 @@ function SectionBlock({ section }: { section: Section }) {
               <motion.h2 variants={item} className="text-2xl md:text-3xl font-bold text-navy leading-tight mb-4">
                 {section.heading}
               </motion.h2>
+              {section.headingImage && (
+                <motion.img
+                  variants={item}
+                  src={section.headingImage}
+                  alt={altFromPath(section.headingImage)}
+                  className="mb-5 w-full h-auto rounded-xl"
+                />
+              )}
               <SectionBody section={section} />
             </div>
           </>
@@ -358,6 +447,14 @@ function SectionBlock({ section }: { section: Section }) {
               <motion.h2 variants={item} className="text-2xl md:text-3xl font-bold text-navy leading-tight mb-4">
                 {section.heading}
               </motion.h2>
+              {section.headingImage && (
+                <motion.img
+                  variants={item}
+                  src={section.headingImage}
+                  alt={altFromPath(section.headingImage)}
+                  className="mb-5 w-full h-auto rounded-xl"
+                />
+              )}
               <SectionBody section={section} />
             </div>
             <motion.div variants={item} className="flex items-center justify-center">
